@@ -3,7 +3,7 @@ let private_ip = false;
 
 chrome.runtime.onInstalled.addListener(() => {
 
-    chrome.storage.sync.set({"privateIp" : private_ip});
+    chrome.storage.sync.set({"private_ips" : private_ip});
     
 
     console.log('private ips set to false');
