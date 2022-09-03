@@ -1,19 +1,95 @@
 
 let privateIpCheckbox = document.getElementById("privateIpCheckbox");
 
+let allowedIpList = document.getElementById("allowedIpList");
+
+let newIpForm = document.getElementById("newIpForm");
+let newIpInput = document.getElementById("newIpInput");
+
+let allowedIps = [];
 
 chrome.storage.sync.get(["private_ip"], ({private_ip }) => {
     privateIpCheckbox.checked = private_ip;
 })
 
+chrome.storage.sync.get(["allowed_ips"], ({allowed_ips }) => {
+    // console.log(allowed_ips);
+    // allowedIps.value = allowed_ips;
 
 
+    allowed_ips.forEach((ip, index) =>{
+        addAllowedIP(ip, index)
+    })
+})
 
+newIpForm.addEventListener("submit",(e) => {
+    e.preventDefault();
+
+    addAllowedIP(newIpInput.value);
+    newIpInput.value = "";
+    chrome.storage.sync.set({"allowed_ips" : allowedIps});
+    // console.log(allowedIps);
+})
+
+function addAllowedIP(ip, index) {
+    let li = document.createElement("li");
+
+    let inputField = document.createElement("input")
+    inputField.value = ip;
+    inputField.readOnly = true;
+
+    let deleteIp = document.createElement("button")
+    deleteIp.innerText = "delete"
+
+    deleteIp.addEventListener("click", () => {
+        deleteAllowedIp(index, li)
+    })
+
+    let editIp = document.createElement("button")
+    editIp.innerText = "edit"
+
+    editIp.addEventListener("click", () => {
+        editAllowedIp(index, li, inputField);
+    })
+
+    li.appendChild(inputField)    
+    li.appendChild(deleteIp)
+    li.appendChild(editIp)
+
+    allowedIpList.appendChild(li)
+    allowedIps.push(ip)
+
+}
+
+function deleteAllowedIp(index, li){
+    allowedIps.splice(index, 1);
+    li.remove();
+    chrome.storage.sync.set({"allowed_ips" : allowedIps});
+}
+
+function editAllowedIp (index, li, inputField) {
+    inputField.readOnly = false;
+
+    let saveIP = document.createElement("button")
+    saveIP.innerText = "Save"
+    li.appendChild(saveIP)
+
+    saveIP.addEventListener("click", () => {
+        allowedIps[index] = inputField.value;
+        inputField.readOnly = true;
+        saveIP.remove()
+        chrome.storage.sync.set({"allowed_ips" : allowedIps});
+
+    })
+}
+
+
+//Event listener for when the checkbox is clicked
 privateIpCheckbox.addEventListener('click', () => {
-    chrome.storage.sync.set({"private_ip" : privateIpCheckbox.checked});
+    chrome.storage.sync.set({"private_ip" : privateIpCheckbox.checked}); // Set the checkbox value to local storage
     
     if (privateIpCheckbox.checked === true){
-        const allowUrls = [
+        const allowIps = [ //array of private IP addresses
             "*://10.*.*.*",
 
             "*://192.168.*.*",
@@ -37,7 +113,7 @@ privateIpCheckbox.addEventListener('click', () => {
 
         ];
         
-        allowUrls.forEach((domain, index) => {
+        allowIps.forEach((domain, index) => {
             let id = index + 1;
         
             chrome.declarativeNetRequest.updateDynamicRules(
