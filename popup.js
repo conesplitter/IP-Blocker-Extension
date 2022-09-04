@@ -8,14 +8,15 @@ let newIpInput = document.getElementById("newIpInput");
 
 let allowedIps = [];
 
+function saveAllowedIpsToLocalStorage(allowedIpsArray) {
+    chrome.storage.sync.set({"allowed_ips" : allowedIpsArray});
+}
+
 chrome.storage.sync.get(["private_ip"], ({private_ip }) => {
     privateIpCheckbox.checked = private_ip;
 })
 
 chrome.storage.sync.get(["allowed_ips"], ({allowed_ips }) => {
-    // console.log(allowed_ips);
-    // allowedIps.value = allowed_ips;
-
 
     allowed_ips.forEach((ip, index) =>{
         addAllowedIP(ip, index)
@@ -27,8 +28,7 @@ newIpForm.addEventListener("submit",(e) => {
 
     addAllowedIP(newIpInput.value);
     newIpInput.value = "";
-    chrome.storage.sync.set({"allowed_ips" : allowedIps});
-    // console.log(allowedIps);
+    saveAllowedIpsToLocalStorage(allowedIps);
 })
 
 function addAllowedIP(ip, index) {
@@ -64,7 +64,7 @@ function addAllowedIP(ip, index) {
 function deleteAllowedIp(index, li){
     allowedIps.splice(index, 1);
     li.remove();
-    chrome.storage.sync.set({"allowed_ips" : allowedIps});
+    saveAllowedIpsToLocalStorage(allowedIps);
 }
 
 function editAllowedIp (index, li, inputField) {
@@ -78,8 +78,7 @@ function editAllowedIp (index, li, inputField) {
         allowedIps[index] = inputField.value;
         inputField.readOnly = true;
         saveIP.remove()
-        chrome.storage.sync.set({"allowed_ips" : allowedIps});
-
+        saveAllowedIpsToLocalStorage(allowedIps);
     })
 }
 
