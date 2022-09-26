@@ -1,4 +1,3 @@
-
 let privateIpCheckbox = document.getElementById("privateIpCheckbox");
 
 let allowedIpList = document.getElementById("allowedIpList");
@@ -8,28 +7,42 @@ let newIpInput = document.getElementById("newIpInput");
 
 let allowedIps = [];
 
-function saveAllowedIpsToLocalStorage(allowedIpsArray) {
-    chrome.storage.sync.set({"allowed_ips" : allowedIpsArray});
-}
+
 
 chrome.storage.sync.get(["private_ip"], ({private_ip }) => {
+    //Getting the state of the private IP toggle checkbox from the chrome local storage
     privateIpCheckbox.checked = private_ip;
 })
 
 chrome.storage.sync.get(["allowed_ips"], ({allowed_ips }) => {
+    //getting the arrary of allowed IPs from local storage
 
     allowed_ips.forEach((ip, index) =>{
+        //passing the IPs to the addAllowedIP function
         addAllowedIP(ip, index)
     })
 })
 
 newIpForm.addEventListener("submit",(e) => {
+    //event listener for input field that add new ips
     e.preventDefault();
 
-    addAllowedIP(newIpInput.value);
+    //passing the value to the addNewAllowedIp function 
+    addNewAllowedIp(newIpInput.value);
+    
     newIpInput.value = "";
+
+    //saving the allowed Ips to local storage
     saveAllowedIpsToLocalStorage(allowedIps);
 })
+
+
+
+function saveAllowedIpsToLocalStorage(allowedIpsArray) {
+    //Function to save the array of allowed IPs to the chrome local storage
+    chrome.storage.sync.set({"allowed_ips" : allowedIpsArray});
+}
+
 
 function addAllowedIP(ip, index) {
     let li = document.createElement("li");
@@ -42,7 +55,7 @@ function addAllowedIP(ip, index) {
     deleteIp.innerText = "delete"
 
     deleteIp.addEventListener("click", () => {
-        deleteAllowedIp(index, li)
+        deleteAllowedIp(index, li, ip)
     })
 
     let editIp = document.createElement("button")
@@ -61,15 +74,84 @@ function addAllowedIP(ip, index) {
 
 }
 
-function deleteAllowedIp(index, li){
+function addNewAllowedIp(ip) {
+    //Function to add a new IP to the list, local storeage and create a rule for it
+
+    //first pass the IP to the addAllowedIP function to create the li for it and add it to the allowedIps array for local storage
+    addAllowedIP(ip);
+
+    allowedIps.forEach((ip, index) => {
+        console.log(ip);
+    })
+    
+
+    let id = 29 + allowedIps.length;
+    // let id
+
+    //need to come back to this
+    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+
+        rules.forEach((rule, index) => {
+
+            let ruleId = rule.id - 1
+
+    
+            if(ruleId != index && ruleId > 29) {
+                id = index
+
+                return id
+            }
+        })
+        
+    })
+    .then(() => {
+        chrome.declarativeNetRequest.updateDynamicRules(
+            {addRules:[{
+               "id": id,
+               "priority": 3,
+               "action": { "type": "allowAllRequests" },
+               "condition": {"urlFilter": ip, "resourceTypes": ["main_frame"] }}
+              ],
+              removeRuleIds: [id]
+            },
+         )
+    })
+
+    
+}
+
+
+
+
+function deleteAllowedIp(index, li, ip){
     allowedIps.splice(index, 1);
+
     li.remove();
     saveAllowedIpsToLocalStorage(allowedIps);
+    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+        
+        rules.forEach(rule => {
+            if (rule.condition.urlFilter == ip && rule.priority == 3) {
+                chrome.declarativeNetRequest.updateDynamicRules(
+                    {
+                        removeRuleIds: [rule.id]
+                    }
+                )
+            } 
+            else {
+                console.log("Rule not found");
+            }
+        })
+    })
+
 }
+
+
 
 function editAllowedIp (index, li, inputField) {
     inputField.readOnly = false;
 
+    //create a save IP btn
     let saveIP = document.createElement("button")
     saveIP.innerText = "Save"
     li.appendChild(saveIP)
@@ -79,6 +161,8 @@ function editAllowedIp (index, li, inputField) {
         inputField.readOnly = true;
         saveIP.remove()
         saveAllowedIpsToLocalStorage(allowedIps);
+
+
     })
 }
 
