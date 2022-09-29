@@ -17,10 +17,20 @@ chrome.storage.sync.get(["private_ip"], ({private_ip }) => {
 chrome.storage.sync.get(["allowed_ips"], ({allowed_ips }) => {
     //getting the arrary of allowed IPs from local storage
 
-    allowed_ips.forEach((ip, index) =>{
-        //passing the IPs to the addAllowedIP function
-        addAllowedIP(ip, index)
+    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+        rules.forEach(rule => {
+            if (rule.priority == 3 && !allowed_ips.includes(rule.condition.urlFilter)) {
+                allowed_ips.push(rule.condition.urlFilter)
+            } 
+        })
+    }).then(() => {
+        allowed_ips.forEach((ip, index) =>{
+            //passing the IPs to the addAllowedIP function
+            addAllowedIP(ip, index)
+        })
     })
+
+
 })
 
 newIpForm.addEventListener("submit",(e) => {
@@ -45,29 +55,31 @@ function saveAllowedIpsToLocalStorage(allowedIpsArray) {
 
 
 function addAllowedIP(ip, index) {
+    //Function to add the allowed IPs to the HTML
     let li = document.createElement("li");
 
     let inputField = document.createElement("input")
     inputField.value = ip;
     inputField.readOnly = true;
 
-    let deleteIp = document.createElement("button")
-    deleteIp.innerText = "delete"
+    let deleteIpBtn = document.createElement("button")
+    deleteIpBtn.innerText = "delete"
 
-    deleteIp.addEventListener("click", () => {
+    deleteIpBtn.addEventListener("click", () => {
         deleteAllowedIp(index, li, ip)
     })
 
-    let editIp = document.createElement("button")
-    editIp.innerText = "edit"
+    let editIpBtn = document.createElement("button")
+    editIpBtn.innerText = "edit"
 
-    editIp.addEventListener("click", () => {
-        editAllowedIp(index, li, inputField);
+    editIpBtn.addEventListener("click", () => {
+        editIpBtn.disabled = true
+        editAllowedIp(index, li, inputField, editIpBtn);
     })
 
     li.appendChild(inputField)    
-    li.appendChild(deleteIp)
-    li.appendChild(editIp)
+    li.appendChild(deleteIpBtn)
+    li.appendChild(editIpBtn)
 
     allowedIpList.appendChild(li)
     allowedIps.push(ip)
@@ -80,31 +92,15 @@ function addNewAllowedIp(ip) {
     //first pass the IP to the addAllowedIP function to create the li for it and add it to the allowedIps array for local storage
     addAllowedIP(ip);
 
-    allowedIps.forEach((ip, index) => {
-        console.log(ip);
-    })
+    // allowedIps.forEach((ip, index) => {
+    //     console.log(ip);
+    // })
     
 
     let id = 29 + allowedIps.length;
     // let id
 
-    //need to come back to this
-    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
 
-        rules.forEach((rule, index) => {
-
-            let ruleId = rule.id - 1
-
-    
-            if(ruleId != index && ruleId > 29) {
-                id = index
-
-                return id
-            }
-        })
-        
-    })
-    .then(() => {
         chrome.declarativeNetRequest.updateDynamicRules(
             {addRules:[{
                "id": id,
@@ -115,6 +111,7 @@ function addNewAllowedIp(ip) {
               removeRuleIds: [id]
             },
          )
+    
     })
 
     
@@ -148,7 +145,7 @@ function deleteAllowedIp(index, li, ip){
 
 
 
-function editAllowedIp (index, li, inputField) {
+function editAllowedIp (index, li, inputField, editIpBtn) {
     inputField.readOnly = false;
 
     //create a save IP btn
@@ -162,8 +159,9 @@ function editAllowedIp (index, li, inputField) {
         saveIP.remove()
         saveAllowedIpsToLocalStorage(allowedIps);
 
-
+        editIpBtn.disabled = false;
     })
+    
 }
 
 
