@@ -41,7 +41,8 @@ newIpForm.addEventListener("submit",(e) => {
     e.preventDefault();
 
     if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(newIpInput.value)) {  
-        
+        // ^^^^ Regex to check to see if the input is a valid ip address
+
         //passing the value to the addNewAllowedIp function 
         addNewAllowedIp(newIpInput.value);
         
@@ -51,7 +52,9 @@ newIpForm.addEventListener("submit",(e) => {
         saveAllowedIpsToLocalStorage(allowedIps);
       } 
       else {
+
         errorMessage.innerHTML = "Please enter a valid IP address" 
+
         newIpInput.addEventListener("click", () => {
             errorMessage.innerHTML = "";
         })
