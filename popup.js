@@ -62,6 +62,7 @@ newIpForm.addEventListener("submit",(e) => {
     
 })
 
+
 function saveAllowedIpsToLocalStorage(allowedIpsArray) {
     //Function to save the array of allowed IPs to the chrome local storage
     chrome.storage.sync.set({"allowed_ips" : allowedIpsArray});
@@ -165,6 +166,8 @@ function addNewAllowedIp(ip) {
 
 
 function deleteAllowedIp(index, li, ip){
+    // Function to delete an IP from the allow list
+
     allowedIps.splice(index, 1);
 
     li.remove();
@@ -186,6 +189,7 @@ function deleteAllowedIp(index, li, ip){
     })
 
 }
+
 
 
 
@@ -251,7 +255,7 @@ privateIpCheckbox.addEventListener('click', () => {
                  removeRuleIds: [id]
                },
             )
-            console.log('RULE ADDED');
+          
         })
     }
     else {
@@ -260,11 +264,4 @@ privateIpCheckbox.addEventListener('click', () => {
             removeRuleIds: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
         })
     }
-
-
-
-    chrome.declarativeNetRequest.getDynamicRules(rule => {
-        console.log(rule);
-    })
-
 })
