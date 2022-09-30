@@ -92,26 +92,22 @@ function addNewAllowedIp(ip) {
     //first pass the IP to the addAllowedIP function to create the li for it and add it to the allowedIps array for local storage
     addAllowedIP(ip);
 
-    // allowedIps.forEach((ip, index) => {
-    //     console.log(ip);
-    // })
     
+    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
 
-    let id = 29 + allowedIps.length;
-    // let id
-
+        let CurrentMaxId = Math.max.apply(Math, rules.map(rule => rule.id)); // finds the current largest ID number
+        let id = CurrentMaxId + 1;
 
         chrome.declarativeNetRequest.updateDynamicRules(
             {addRules:[{
-               "id": id,
-               "priority": 3,
-               "action": { "type": "allowAllRequests" },
-               "condition": {"urlFilter": ip, "resourceTypes": ["main_frame"] }}
-              ],
-              removeRuleIds: [id]
+                "id": id,
+                "priority": 3,
+                "action": { "type": "allowAllRequests" },
+                "condition": {"urlFilter": ip, "resourceTypes": ["main_frame"] }}
+                ],
+                removeRuleIds: [id]
             },
-         )
-    
+            )
     })
 
     
