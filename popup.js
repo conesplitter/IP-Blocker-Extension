@@ -4,6 +4,7 @@ let allowedIpList = document.getElementById("allowedIpList");
 
 let newIpForm = document.getElementById("newIpForm");
 let newIpInput = document.getElementById("newIpInput");
+let errorMessage = document.getElementById("errorMessage");
 
 let allowedIps = [];
 
@@ -33,20 +34,30 @@ chrome.storage.sync.get(["allowed_ips"], ({allowed_ips }) => {
 
 })
 
+
+
 newIpForm.addEventListener("submit",(e) => {
     //event listener for input field that add new ips
     e.preventDefault();
 
-    //passing the value to the addNewAllowedIp function 
-    addNewAllowedIp(newIpInput.value);
+    if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(newIpInput.value)) {  
+        
+        //passing the value to the addNewAllowedIp function 
+        addNewAllowedIp(newIpInput.value);
+        
+        newIpInput.value = "";
+
+        //saving the allowed Ips to local storage
+        saveAllowedIpsToLocalStorage(allowedIps);
+      } 
+      else {
+        errorMessage.innerHTML = "Please enter a valid IP address" 
+        newIpInput.addEventListener("click", () => {
+            errorMessage.innerHTML = "";
+        })
+      }
     
-    newIpInput.value = "";
-
-    //saving the allowed Ips to local storage
-    saveAllowedIpsToLocalStorage(allowedIps);
 })
-
-
 
 function saveAllowedIpsToLocalStorage(allowedIpsArray) {
     //Function to save the array of allowed IPs to the chrome local storage
@@ -95,22 +106,56 @@ function addNewAllowedIp(ip) {
     
     chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
 
-        let CurrentMaxId = Math.max.apply(Math, rules.map(rule => rule.id)); // finds the current largest ID number
-        let id = CurrentMaxId + 1;
+
+        rules.sort((a, b) => (a.id > b.id) ? 1 : -1) // sorting the rules by ID
+        
+        let ruleIds = [];
+        let ruleId;
+    
+        rules.forEach(rule => {
+            ruleIds.push(rule.id)
+        })
+        
+        const missing = [];
+    
+        for (let i in ruleIds) {
+            // get the size of the gap
+            let x = ruleIds[i] - ruleIds[i - 1];
+            // start filling in the gap with `1`
+            let diff = 1;
+            // while there's still a gap, push the correct numbers
+            // into `missing`, calculated by the number + diff
+            while (diff < x && (ruleIds[i - 1] + diff) > 28) {
+              missing.push(ruleIds[i - 1] + diff);
+              diff++;
+            }
+          }
+
+        if(missing.length != 0) {
+            ruleId = missing[0];
+        }
+        else {
+            let CurrentMaxId = Math.max.apply(Math, rules.map(rule => rule.id)); // finds the current largest ID number
+            ruleId = CurrentMaxId + 1;
+        }
+
+
 
         chrome.declarativeNetRequest.updateDynamicRules(
             {addRules:[{
-                "id": id,
+                "id": ruleId,
                 "priority": 3,
                 "action": { "type": "allowAllRequests" },
                 "condition": {"urlFilter": ip, "resourceTypes": ["main_frame"] }}
                 ],
-                removeRuleIds: [id]
+                removeRuleIds: [ruleId]
             },
             )
-    })
 
-    
+        
+
+
+    })
 }
 
 
@@ -145,14 +190,14 @@ function editAllowedIp (index, li, inputField, editIpBtn) {
     inputField.readOnly = false;
 
     //create a save IP btn
-    let saveIP = document.createElement("button")
-    saveIP.innerText = "Save"
-    li.appendChild(saveIP)
+    let saveIpBtn = document.createElement("button")
+    saveIpBtn.innerText = "Save"
+    li.appendChild(saveIpBtn)
 
-    saveIP.addEventListener("click", () => {
+    saveIpBtn.addEventListener("click", () => {
         allowedIps[index] = inputField.value;
         inputField.readOnly = true;
-        saveIP.remove()
+        saveIpBtn.remove()
         saveAllowedIpsToLocalStorage(allowedIps);
 
         editIpBtn.disabled = false;
