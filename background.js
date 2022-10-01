@@ -1,9 +1,58 @@
 let private_ip = false;
 let allowedIps= [];
 
+
 chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.sync.set({"private_ips" : private_ip});
     chrome.storage.sync.set({"allowed_ips" : allowedIps});
+
+    let idToDelete = [];
+
+
+    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+        const privateIpsArray = [ //array of private IP addresses
+        "*://10.*.*.*",
+
+        "*://192.168.*.*",
+
+        "*://172.16.*.*",
+        "*://172.17.*.*",
+        "*://172.18.*.*",
+        "*://172.19.*.*",
+        "*://172.20.*.*",
+        "*://172.21.*.*",
+        "*://172.22.*.*",
+        "*://172.23.*.*",
+        "*://172.24.*.*",
+        "*://172.25.*.*",
+        "*://172.26.*.*",
+        "*://172.27.*.*",
+        "*://172.28.*.*",
+        "*://172.29.*.*",
+        "*://172.30.*.*",
+        "*://172.31.*.*",
+        ];
+    
+
+        rules.forEach(rule => {
+            if(privateIpsArray.includes(rule.condition.urlFilter) && rule.priority == 2) {
+                idToDelete.push(rule.id)
+            }
+        })
+
+    }).then(() =>{ 
+        
+        idToDelete.forEach(id => {
+            chrome.declarativeNetRequest.updateDynamicRules(
+                {    
+                    //delete all of the private IP allow rules if someone has reinstalled the plugin 
+                    removeRuleIds: [id]
+                })
+            })
+        })
+
+
+
 }) 
 
 
