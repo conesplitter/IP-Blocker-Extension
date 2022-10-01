@@ -39,26 +39,57 @@ chrome.storage.sync.get(["allowed_ips"], ({allowed_ips }) => {
 newIpForm.addEventListener("submit",(e) => {
     //event listener for input field that add new ips
     e.preventDefault();
+    let uniqueIp = false;
 
-    if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(newIpInput.value)) {  
-        // ^^^^ Regex to check to see if the input is a valid ip address
-
-        //passing the value to the addNewAllowedIp function 
-        addNewAllowedIp(newIpInput.value);
+    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+        let allIps = [];
         
-        newIpInput.value = "";
 
-        //saving the allowed Ips to local storage
-        saveAllowedIpsToLocalStorage(allowedIps);
-      } 
-      else {
-
-        errorMessage.innerHTML = "Please enter a valid IP address" 
-
-        newIpInput.addEventListener("click", () => {
-            errorMessage.innerHTML = "";
+        rules.forEach(rule => {
+            allIps.push(rule.condition.urlFilter);
         })
-      }
+
+        if(!allIps.includes(newIpInput.value)){
+            uniqueIp = true;
+        }
+
+        console.log(newIpInput.value);
+        console.log(allIps);
+        console.log(allIps.includes(newIpInput.value));
+        
+
+     
+    }).then(() =>{
+        let validIp = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(newIpInput.value);
+        //           ^^^^ Regex to check to see if the input is a valid ip address
+
+        if (validIp && uniqueIp) {  
+            
+    
+            //passing the value to the addNewAllowedIp function 
+            addNewAllowedIp(newIpInput.value);
+            
+            newIpInput.value = "";
+    
+            //saving the allowed Ips to local storage
+            saveAllowedIpsToLocalStorage(allowedIps);
+          } 
+          else {
+    
+            if(!validIp) {
+                errorMessage.innerHTML = "Please enter a valid IP address" 
+            }
+            else if (!uniqueIp) {
+                errorMessage.innerHTML = "This IP address is already on the allow list" 
+            }
+            
+    
+            newIpInput.addEventListener("click", () => {
+                errorMessage.innerHTML = null;
+            })
+          }
+    })
+    
     
 })
 
