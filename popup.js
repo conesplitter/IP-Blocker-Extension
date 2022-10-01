@@ -110,6 +110,11 @@ newIpForm.addEventListener("submit",(e) => {
             newIpInput.addEventListener("click", () => {
                 errorMessage.innerHTML = null;
             })
+
+            newIpInput.addEventListener("input", () => {
+                errorMessage.innerHTML = null;
+            })
+
           }
     })
     
@@ -142,7 +147,7 @@ function addAllowedIP(ip, index) {
     editIpBtn.innerText = "edit"
 
     editIpBtn.addEventListener("click", () => {
-        editAllowedIp(index, li, inputField, editIpBtn);
+        editAllowedIp(index, li, inputField, editIpBtn, ip);
     })
 
     li.appendChild(inputField)    
@@ -246,9 +251,12 @@ function deleteAllowedIp(index, li, ip){
 
 
 
-function editAllowedIp (index, li, inputField, editIpBtn) {
+function editAllowedIp (index, li, inputField, editIpBtn, ip) {
+    console.log(ip);
     inputField.readOnly = false;
     editIpBtn.classList.add("hidden");
+
+    let id;
 
     //create a save IP btn
     let saveIpBtn = document.createElement("button")
@@ -262,10 +270,36 @@ function editAllowedIp (index, li, inputField, editIpBtn) {
         saveAllowedIpsToLocalStorage(allowedIps);
 
         editIpBtn.classList.remove("hidden");
-        // editIpBtn.disabled = false;
+
+        chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+
+            rules.forEach(rule => {
+                if(rule.condition.urlFilter == ip && rule.priority == 3){
+                    id = rule.id
+                }
+
+            })
+
+        }).then(() => {
+            chrome.declarativeNetRequest.updateDynamicRules(
+                {addRules:[{
+                   "id": id,
+                   "priority": 3,
+                   "action": { "type": "allowAllRequests" },
+                   "condition": {"urlFilter": inputField.value, "resourceTypes": ["main_frame"] }}
+                  ],
+                  removeRuleIds: [id]
+                },
+             )
+        })
+        
     })
     
 }
+
+chrome.declarativeNetRequest.getDynamicRules(rule => {
+    console.log(rule);
+})
 
 
 //Event listener for when the checkbox is clicked
