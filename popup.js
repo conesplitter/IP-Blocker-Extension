@@ -8,6 +8,29 @@ let errorMessage = document.getElementById("errorMessage");
 
 let allowedIps = [];
 
+const privateIpsArray = [ //array of private IP addresses
+    "*://10.*.*.*",
+
+    "*://192.168.*.*",
+
+    "*://172.16.*.*",
+    "*://172.17.*.*",
+    "*://172.18.*.*",
+    "*://172.19.*.*",
+    "*://172.20.*.*",
+    "*://172.21.*.*",
+    "*://172.22.*.*",
+    "*://172.23.*.*",
+    "*://172.24.*.*",
+    "*://172.25.*.*",
+    "*://172.26.*.*",
+    "*://172.27.*.*",
+    "*://172.28.*.*",
+    "*://172.29.*.*",
+    "*://172.30.*.*",
+    "*://172.31.*.*",
+
+];
 
 
 chrome.storage.sync.get(["private_ip"], ({private_ip }) => {
@@ -249,31 +272,9 @@ privateIpCheckbox.addEventListener('click', () => {
     chrome.storage.sync.set({"private_ip" : privateIpCheckbox.checked}); // Set the checkbox value to local storage
     
     if (privateIpCheckbox.checked === true){
-        const allowIps = [ //array of private IP addresses
-            "*://10.*.*.*",
 
-            "*://192.168.*.*",
-
-            "*://172.16.*.*",
-            "*://172.17.*.*",
-            "*://172.18.*.*",
-            "*://172.19.*.*",
-            "*://172.20.*.*",
-            "*://172.21.*.*",
-            "*://172.22.*.*",
-            "*://172.23.*.*",
-            "*://172.24.*.*",
-            "*://172.25.*.*",
-            "*://172.26.*.*",
-            "*://172.27.*.*",
-            "*://172.28.*.*",
-            "*://172.29.*.*",
-            "*://172.30.*.*",
-            "*://172.31.*.*",
-
-        ];
         
-        allowIps.forEach((domain, index) => {
+        privateIpsArray.forEach((domain, index) => {
             let id = index + 1;
         
             chrome.declarativeNetRequest.updateDynamicRules(
