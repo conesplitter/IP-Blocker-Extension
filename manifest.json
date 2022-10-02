@@ -1,8 +1,8 @@
 {
     "name": "IP Blocker",
-    "description": "A simple extension that blocks all search request for IP addresses. The extension has the option to allow private IP addresses and to add IP addresses to an allow list",
+    "description": "Blocks all request to IP addresses. You have the option to allow all private IP addresses and to add IP addresses to an allow list",
     "manifest_version": 3,
-    "version": "0.1.0",
+    "version": "1.0.0",
     "background": {
       "service_worker": "background.js"
     },
