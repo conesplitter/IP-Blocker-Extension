@@ -4,22 +4,24 @@
     </head>
     <body>
         <div class="container">
-            <div>
-                <input type="checkbox" id="privateIpCheckbox">
-                <p>Enable Private IPs?</p>
+            <div class="flex flex-col">
+                <div class="flex" id="privateIPContainer">
+                    <input type="checkbox" id="privateIpCheckbox">
+                    <p id="enablePrivateIps">Enable Private IPs?</p>
+                </div>
+                
+    
+                <div class="flex flex-col gap-y-4">
+                    <ul id="allowedIpList" class="flex flex-col"></ul>
+    
+                    <form id="newIpForm">
+                        <input type="text" id="newIpInput" placeholder="Add new allowed IP">
+                        <input type="submit" id="newIpSubmit" class="btn submitBtn">
+                    </form>
+                    <p id="errorMessage"></p>
+                </div>
             </div>
             
-
-            <div>
-                <ul id="allowedIpList">
-
-                </ul>
-                <form id="newIpForm">
-                    <input type="text" id="newIpInput" placeholder="Add new allowed IP">
-                    <input type="submit" id="newIpSubmit">
-                </form>
-                <p id="errorMessage"></p>
-            </div>
         </div>
 
         <script src="popup.js"></script>

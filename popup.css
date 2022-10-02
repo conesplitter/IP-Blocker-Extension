@@ -1,14 +1,8 @@
 .container {
-  width: 20rem;
-  max-height: 20rem;
-  padding: 1rem;
-  overflow-y: scroll;
-
+  width: 18rem;
+  padding: 1rem 2rem;;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }  
-
-li {
-  list-style-type: none;
-}
 
 .flex {
   display: flex;
@@ -30,7 +24,10 @@ html,body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  height: fit-content;
 }
+
+
 
 #allowedIpList {
   gap: 0.5rem;
@@ -47,4 +44,72 @@ html,body {
 
 #errorMessage {
   margin: 0;
+}
+
+p{
+  margin: 0;
+}
+
+#privateIPContainer {
+  padding-bottom: 1rem;
+  gap: 1rem;
+  align-items: center;
+}
+
+#enablePrivateIps {
+  font-size: 1.25rem;
+}
+
+#privateIpCheckbox {
+  width: 18px;
+  height: 18px;
+}
+
+
+
+.btn { 
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.3rem;
+  color: white;
+  transition: transform 0.25s;
+}
+
+.btn:hover {
+  -webkit-backface-visibility: hidden;
+  transform: translateY(-0.05rem);
+}
+
+.deleteBtn {
+  background-color: #ff8181;
+}
+
+.editBtn {
+  background-color: #399ebf;
+}
+
+.saveBtn {
+  background-color: #81d381;
+}
+.submitBtn {
+  background-color: #b3bbb3;
+}
+
+
+li {
+  display: flex;
+  gap: 0.25rem;
+  list-style-type: none;
+
+}
+
+input {
+  border-radius: 0.25rem;
+  border: 1px solid #b3bbb3;
+  padding: 0.25rem;
+}
+
+#newIpInput {
+  height: 24.59px;
+
 }
