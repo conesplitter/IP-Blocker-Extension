@@ -1,9 +1,8 @@
 {
     "name": "IP Blocker",
-    "description": "Blocks IPs",
+    "description": "A simple extension that blocks all search request for IP addresses. The extension has the option to allow private IP addresses and to add IP addresses to an allow list",
     "manifest_version": 3,
     "version": "0.1.0",
-    "options_page": "options.html",
     "background": {
       "service_worker": "background.js"
     },
@@ -13,8 +12,20 @@
       "storage"
     ],
     "action": {
-      "default_title": "My YT Bookmarks",
-      "default_popup": "popup.html"
-    }
+      "default_title": "IP Blocker",
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "images/favicon16.png",
+        "32": "/images/favicon32.png",
+        "48": "/images/icon48.png",
+        "128": "/images/icon128.png"
+      }
+    },
+    "icons": {
+      "16": "images/favicon16.png",
+      "32": "images/favicon32.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+      }
 
   }
