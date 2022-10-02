@@ -140,6 +140,11 @@ function addAllowedIP(ip, index) {
     //Function to add the allowed IPs to the HTML
     let li = document.createElement("li");
 
+    let childDiv = document.createElement("div");
+    childDiv.classList.add("AllowedIPAndBtns")
+    li.appendChild(childDiv)
+
+
     let inputField = document.createElement("input")
     inputField.value = ip;
     inputField.readOnly = true;
@@ -158,12 +163,12 @@ function addAllowedIP(ip, index) {
 
 
     editIpBtn.addEventListener("click", () => {
-        editAllowedIp(index, li, inputField, editIpBtn, ip);
+        editAllowedIp(index, li, childDiv, inputField, editIpBtn, ip);
     })
 
-    li.appendChild(inputField)    
-    li.appendChild(deleteIpBtn)
-    li.appendChild(editIpBtn)
+    childDiv.appendChild(inputField)    
+    childDiv.appendChild(deleteIpBtn)
+    childDiv.appendChild(editIpBtn)
 
     allowedIpList.appendChild(li)
     allowedIps.push(ip)
@@ -262,19 +267,16 @@ function deleteAllowedIp(index, li, ip){
 
 
 
-function editAllowedIp (index, li, inputField, editIpBtn, ip) {
-    console.log(ip);
+function editAllowedIp (index, li, childDiv, inputField, editIpBtn, ip) {
     inputField.readOnly = false;
     editIpBtn.classList.add("hidden");
 
-    
-    
 
     //create a save IP btn
     let saveIpBtn = document.createElement("button")
     saveIpBtn.innerText = "Save"
     saveIpBtn.classList.add("btn","saveBtn")
-    li.appendChild(saveIpBtn)
+    childDiv.appendChild(saveIpBtn)
 
     saveIpBtn.addEventListener("click", () => {
         let id;

@@ -95,12 +95,16 @@ p{
   background-color: #b3bbb3;
 }
 
+.AllowedIPAndBtns {
+  display: flex;
+  gap: 0.25rem;
+}
 
 li {
   display: flex;
-  gap: 0.25rem;
+  flex-direction: column;
   list-style-type: none;
-
+  gap: 0.25rem;
 }
 
 input {
