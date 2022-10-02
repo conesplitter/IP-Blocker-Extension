@@ -32,6 +32,11 @@ const privateIpsArray = [ //array of private IP addresses
 
 ];
 
+const errorMessages = [
+    "Please enter a valid IP address",
+    "This IP address is already on the allow list"
+]
+
 
 chrome.storage.sync.get(["private_ip"], ({private_ip }) => {
     //Getting the state of the private IP toggle checkbox from the chrome local storage
@@ -76,15 +81,12 @@ newIpForm.addEventListener("submit",(e) => {
             uniqueIp = true;
         }
 
-        console.log(newIpInput.value);
-        console.log(allIps);
-        console.log(allIps.includes(newIpInput.value));
         
 
      
     }).then(() =>{
-        let validIp = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(newIpInput.value);
-        //           ^^^^ Regex to check to see if the input is a valid ip address
+        let validIp = isIpValid(newIpInput.value) 
+
 
         if (validIp && uniqueIp) {  
             
@@ -100,10 +102,10 @@ newIpForm.addEventListener("submit",(e) => {
           else {
     
             if(!validIp) {
-                errorMessage.innerHTML = "Please enter a valid IP address" 
+                errorMessage.innerHTML = errorMessages[0] //Please enter a valid IP address
             }
             else if (!uniqueIp) {
-                errorMessage.innerHTML = "This IP address is already on the allow list" 
+                errorMessage.innerHTML = errorMessages[1] //This IP address is already on the allow list
             }
             
     
@@ -120,6 +122,12 @@ newIpForm.addEventListener("submit",(e) => {
     
     
 })
+
+
+function isIpValid(ip) {
+   return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ip)
+   //^^^^ Regex to check to see if the input is a valid ip address
+}
 
 
 function saveAllowedIpsToLocalStorage(allowedIpsArray) {
@@ -256,7 +264,8 @@ function editAllowedIp (index, li, inputField, editIpBtn, ip) {
     inputField.readOnly = false;
     editIpBtn.classList.add("hidden");
 
-    let id;
+    
+    
 
     //create a save IP btn
     let saveIpBtn = document.createElement("button")
@@ -264,33 +273,79 @@ function editAllowedIp (index, li, inputField, editIpBtn, ip) {
     li.appendChild(saveIpBtn)
 
     saveIpBtn.addEventListener("click", () => {
-        allowedIps[index] = inputField.value;
-        inputField.readOnly = true;
-        saveIpBtn.remove()
-        saveAllowedIpsToLocalStorage(allowedIps);
-
-        editIpBtn.classList.remove("hidden");
-
+        let id;
+        let uniqueIp = false;
+        
         chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+
+            let allIps = [];
+        
+
+            rules.forEach(rule => {
+                allIps.push(rule.condition.urlFilter);
+            })
+
+
+            if (!allIps.includes(inputField.value) || inputField.value == ip){
+                uniqueIp = true;
+            }
+
 
             rules.forEach(rule => {
                 if(rule.condition.urlFilter == ip && rule.priority == 3){
                     id = rule.id
                 }
-
             })
 
         }).then(() => {
-            chrome.declarativeNetRequest.updateDynamicRules(
-                {addRules:[{
-                   "id": id,
-                   "priority": 3,
-                   "action": { "type": "allowAllRequests" },
-                   "condition": {"urlFilter": inputField.value, "resourceTypes": ["main_frame"] }}
-                  ],
-                  removeRuleIds: [id]
-                },
-             )
+
+            let validIp = isIpValid(inputField.value) 
+
+            if(validIp && uniqueIp) {
+                console.log(id);
+
+                allowedIps[index] = inputField.value;
+                inputField.readOnly = true;
+                saveIpBtn.remove()
+                saveAllowedIpsToLocalStorage(allowedIps);
+        
+                editIpBtn.classList.remove("hidden");
+    
+                chrome.declarativeNetRequest.updateDynamicRules(
+                    {addRules:[{
+                       "id": id,
+                       "priority": 3,
+                       "action": { "type": "allowAllRequests" },
+                       "condition": {"urlFilter": inputField.value, "resourceTypes": ["main_frame"] }}
+                      ],
+                      removeRuleIds: [id]
+                    },
+                 )
+                 id = null;
+            }
+            else {
+
+                let editErrorMessage = document.createElement("p")
+                
+                if(!validIp) {
+                    editErrorMessage.innerHTML = errorMessages[0] //Please enter a valid IP address
+                }
+                else if (!uniqueIp) {
+                    editErrorMessage.innerHTML = errorMessages[1] //This IP address is already on the allow list
+                }
+
+                li.appendChild(editErrorMessage)   
+                
+        
+                inputField.addEventListener("click", () => {
+                    editErrorMessage.remove();
+                })
+    
+                inputField.addEventListener("input", () => {
+                    editErrorMessage.remove();
+                })
+            }
+
         })
         
     })
