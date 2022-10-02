@@ -145,14 +145,17 @@ function addAllowedIP(ip, index) {
     inputField.readOnly = true;
 
     let deleteIpBtn = document.createElement("button")
-    deleteIpBtn.innerText = "delete"
+    deleteIpBtn.innerText = "Delete"
+    deleteIpBtn.classList.add("deleteBtn", "btn")
 
     deleteIpBtn.addEventListener("click", () => {
         deleteAllowedIp(index, li, ip)
     })
 
     let editIpBtn = document.createElement("button")
-    editIpBtn.innerText = "edit"
+    editIpBtn.innerText = "Edit"
+    editIpBtn.classList.add("editBtn", "btn")
+
 
     editIpBtn.addEventListener("click", () => {
         editAllowedIp(index, li, inputField, editIpBtn, ip);
@@ -270,6 +273,7 @@ function editAllowedIp (index, li, inputField, editIpBtn, ip) {
     //create a save IP btn
     let saveIpBtn = document.createElement("button")
     saveIpBtn.innerText = "Save"
+    saveIpBtn.classList.add("btn","saveBtn")
     li.appendChild(saveIpBtn)
 
     saveIpBtn.addEventListener("click", () => {
