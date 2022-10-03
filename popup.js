@@ -140,9 +140,9 @@ function addAllowedIP(ip, index) {
     //Function to add the allowed IPs to the HTML
     let li = document.createElement("li");
 
-    let childDiv = document.createElement("div");
-    childDiv.classList.add("AllowedIPAndBtns")
-    li.appendChild(childDiv)
+    let AllowedIPAndBtnsDiv = document.createElement("div");
+    AllowedIPAndBtnsDiv.classList.add("AllowedIPAndBtns")
+    li.appendChild(AllowedIPAndBtnsDiv)
 
 
     let inputField = document.createElement("input")
@@ -163,12 +163,12 @@ function addAllowedIP(ip, index) {
 
 
     editIpBtn.addEventListener("click", () => {
-        editAllowedIp(index, li, childDiv, inputField, editIpBtn, ip);
+        editAllowedIp(index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, ip);
     })
 
-    childDiv.appendChild(inputField)    
-    childDiv.appendChild(deleteIpBtn)
-    childDiv.appendChild(editIpBtn)
+    AllowedIPAndBtnsDiv.appendChild(inputField)    
+    AllowedIPAndBtnsDiv.appendChild(deleteIpBtn)
+    AllowedIPAndBtnsDiv.appendChild(editIpBtn)
 
     allowedIpList.appendChild(li)
     allowedIps.push(ip)
@@ -267,7 +267,7 @@ function deleteAllowedIp(index, li, ip){
 
 
 
-function editAllowedIp (index, li, childDiv, inputField, editIpBtn, ip) {
+function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, ip) {
     inputField.readOnly = false;
     editIpBtn.classList.add("hidden");
 
@@ -276,7 +276,7 @@ function editAllowedIp (index, li, childDiv, inputField, editIpBtn, ip) {
     let saveIpBtn = document.createElement("button")
     saveIpBtn.innerText = "Save"
     saveIpBtn.classList.add("btn","saveBtn")
-    childDiv.appendChild(saveIpBtn)
+    AllowedIPAndBtnsDiv.appendChild(saveIpBtn)
 
     saveIpBtn.addEventListener("click", () => {
         let id;
