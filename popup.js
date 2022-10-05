@@ -140,9 +140,10 @@ function addAllowedIP(ip, index) {
     //Function to add the allowed IPs to the HTML
     let li = document.createElement("li");
 
+    //Create the div that the IP address (in the input element) and the edit and delete btns will be in
     let AllowedIPAndBtnsDiv = document.createElement("div");
     AllowedIPAndBtnsDiv.classList.add("AllowedIPAndBtns")
-    li.appendChild(AllowedIPAndBtnsDiv)
+    li.appendChild(AllowedIPAndBtnsDiv) //Add to the Li of the allowed IPs list
 
 
     let inputField = document.createElement("input")
@@ -191,30 +192,35 @@ function addNewAllowedIp(ip) {
         let ruleId;
     
         rules.forEach(rule => {
-            ruleIds.push(rule.id)
+            ruleIds.push(rule.id) //add the rule IDs to a new variable
         })
         
-        const missing = [];
+        const gapsInRuleIDs = [];
     
         for (let i in ruleIds) {
+            //find gaps in the rules, as long as that ID number is greater than 28
+            //28 because thats the number of rules for blocking the private and public IP ranges
+
             // get the size of the gap
             let x = ruleIds[i] - ruleIds[i - 1];
+
             // start filling in the gap with `1`
             let diff = 1;
+
             // while there's still a gap, push the correct numbers
-            // into `missing`, calculated by the number + diff
+            // into `gapsInRuleIDs`, calculated by the number + diff
             while (diff < x && (ruleIds[i - 1] + diff) > 28) {
-              missing.push(ruleIds[i - 1] + diff);
+              gapsInRuleIDs.push(ruleIds[i - 1] + diff);
               diff++;
             }
           }
 
-        if(missing.length != 0) {
-            ruleId = missing[0];
+        if(gapsInRuleIDs.length != 0) {
+            ruleId = gapsInRuleIDs[0]; //If there is a gap, get the first gap from the array
         }
         else {
             let CurrentMaxId = Math.max.apply(Math, rules.map(rule => rule.id)); // finds the current largest ID number
-            ruleId = CurrentMaxId + 1;
+            ruleId = CurrentMaxId + 1; // new highest ID
         }
 
 
@@ -242,23 +248,21 @@ function addNewAllowedIp(ip) {
 function deleteAllowedIp(index, li, ip){
     // Function to delete an IP from the allow list
 
-    allowedIps.splice(index, 1);
+    allowedIps.splice(index, 1); //delete it from the local allowed IP array
 
     li.remove();
-    saveAllowedIpsToLocalStorage(allowedIps);
+    saveAllowedIpsToLocalStorage(allowedIps); //save local allowed IP array to local storage
     chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
         
         rules.forEach(rule => {
             if (rule.condition.urlFilter == ip && rule.priority == 3) {
+                //if the ID of the rule by the IP address and the prority
                 chrome.declarativeNetRequest.updateDynamicRules(
                     {
                         removeRuleIds: [rule.id]
                     }
                 )
             } 
-            else {
-                console.log("Rule not found");
-            }
         })
     })
 
@@ -268,6 +272,9 @@ function deleteAllowedIp(index, li, ip){
 
 
 function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, ip) {
+    //function that edits the allowed IP addresses
+
+    //allows the user to edit the field and hide the edit btn
     inputField.readOnly = false;
     editIpBtn.classList.add("hidden");
 
@@ -288,36 +295,39 @@ function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, i
         
 
             rules.forEach(rule => {
-                allIps.push(rule.condition.urlFilter);
+                allIps.push(rule.condition.urlFilter); //push all of the IP addresses to a new variable
             })
 
 
-            if (!allIps.includes(inputField.value) || inputField.value == ip){
+            if (!allIps.includes(inputField.value) || inputField.value == ip){ 
+                // If the new IP isn't already on the allowed or the IP address is the same as it already was
                 uniqueIp = true;
             }
 
 
             rules.forEach(rule => {
                 if(rule.condition.urlFilter == ip && rule.priority == 3){
+                    //finds the ID of the old IP address
                     id = rule.id
                 }
             })
 
         }).then(() => {
 
-            let validIp = isIpValid(inputField.value) 
+            let validIp = isIpValid(inputField.value) //check if the new IP is a vaild IP address
 
             if(validIp && uniqueIp) {
-                console.log(id);
+                
 
-                allowedIps[index] = inputField.value;
-                inputField.readOnly = true;
+                allowedIps[index] = inputField.value; //saving the IP address to the local array of IPs
+                inputField.readOnly = true; //set it back so they can't edit i
                 saveIpBtn.remove()
-                saveAllowedIpsToLocalStorage(allowedIps);
+                saveAllowedIpsToLocalStorage(allowedIps); //save the allowed Ips array to local storage
         
                 editIpBtn.classList.remove("hidden");
     
                 chrome.declarativeNetRequest.updateDynamicRules(
+                    //save the new IP address to the ID of the old one
                     {addRules:[{
                        "id": id,
                        "priority": 3,
@@ -327,9 +337,9 @@ function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, i
                       removeRuleIds: [id]
                     },
                  )
-                 id = null;
             }
             else {
+                //error cehcking for editing the IP
 
                 let editErrorMessage = document.createElement("p")
                 
