@@ -43,23 +43,18 @@ chrome.storage.sync.get(["private_ip"], ({private_ip }) => {
     privateIpCheckbox.checked = private_ip;
 })
 
-chrome.storage.sync.get(["allowed_ips"], ({allowed_ips }) => {
-    //getting the arrary of allowed IPs from local storage
-
-    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
-        rules.forEach(rule => {
-            if (rule.priority == 3 && !allowed_ips.includes(rule.condition.urlFilter)) {
-                allowed_ips.push(rule.condition.urlFilter)
-            } 
-        })
-    }).then(() => {
-        allowed_ips.forEach((ip, index) =>{
-            //passing the IPs to the addAllowedIP function
-            addAllowedIP(ip, index)
-        })
+chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+    
+    rules.forEach(rule => {
+        if (rule.priority == 3 && !allowedIps.includes(rule.condition.urlFilter)) {
+            allowedIps.push(rule.condition.urlFilter)
+        } 
     })
-
-
+}).then(() => {
+    allowedIps.forEach((ip, index) =>{
+        //passing the IPs to the addAllowedIP function which will render them in the html
+        addAllowedIP(ip, index)
+    })
 })
 
 
@@ -172,7 +167,6 @@ function addAllowedIP(ip, index) {
     AllowedIPAndBtnsDiv.appendChild(editIpBtn)
 
     allowedIpList.appendChild(li)
-    allowedIps.push(ip)
 
 }
 
