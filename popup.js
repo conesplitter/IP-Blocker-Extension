@@ -43,14 +43,13 @@ chrome.storage.sync.get(["private_ip"], ({private_ip }) => {
     privateIpCheckbox.checked = private_ip;
 })
 
-chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
-    
+getRules().then((rules) => {
     rules.forEach(rule => {
         if (rule.priority == 3) {
             allowedIps.push(rule.condition.urlFilter)
         } 
     })
-}).then(() => {
+
     allowedIps.forEach((ip, index) =>{
         //passing the IPs to the addAllowedIP function which will render them in the html
         addAllowedIP(ip, index)
@@ -64,7 +63,7 @@ newIpForm.addEventListener("submit",(e) => {
     e.preventDefault();
     let uniqueIp = false;
 
-    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+    getRules().then((rules) =>{
         let allIps = [];
         
 
@@ -76,10 +75,6 @@ newIpForm.addEventListener("submit",(e) => {
             uniqueIp = true;
         }
 
-        
-
-     
-    }).then(() =>{
         let validIp = isIpValid(newIpInput.value) 
 
 
@@ -113,10 +108,18 @@ newIpForm.addEventListener("submit",(e) => {
             })
 
           }
+
     })
-    
-    
 })
+
+async function getRules() {
+    try {
+        return await chrome.declarativeNetRequest.getDynamicRules();
+    } catch(error) {
+        console.log(error);
+    }
+}
+
 
 
 function isIpValid(ip) {
@@ -177,7 +180,7 @@ function addNewAllowedIp(ip) {
     addAllowedIP(ip);
 
     
-    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+    getRules().then((rules) => {
 
 
         rules.sort((a, b) => (a.id > b.id) ? 1 : -1) // sorting the rules by ID
@@ -246,11 +249,12 @@ function deleteAllowedIp(index, li, ip){
 
     li.remove();
     saveAllowedIpsToLocalStorage(allowedIps); //save local allowed IP array to local storage
-    chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+    getRules().then((rules) => {
         
         rules.forEach(rule => {
             if (rule.condition.urlFilter == ip && rule.priority == 3) {
                 //if the ID of the rule by the IP address and the prority
+                console.log(`${rule.id} has been deleted`);
                 chrome.declarativeNetRequest.updateDynamicRules(
                     {
                         removeRuleIds: [rule.id]
@@ -283,7 +287,7 @@ function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, i
         let id;
         let uniqueIp = false;
         
-        chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+        getRules().then((rules) => {
 
             let allIps = [];
         
@@ -306,7 +310,6 @@ function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, i
                 }
             })
 
-        }).then(() => {
 
             let validIp = isIpValid(inputField.value) //check if the new IP is a vaild IP address
 
@@ -355,16 +358,17 @@ function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, i
                     editErrorMessage.remove();
                 })
             }
-
         })
-        
     })
     
 }
 
-chrome.declarativeNetRequest.getDynamicRules(rule => {
-    console.log(rule);
+
+
+getRules().then((t) => {
+    console.log(t);
 })
+
 
 
 //Event listener for when the checkbox is clicked
