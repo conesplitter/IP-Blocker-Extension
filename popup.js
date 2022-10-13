@@ -46,7 +46,7 @@ chrome.storage.sync.get(["private_ip"], ({private_ip }) => {
 chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
     
     rules.forEach(rule => {
-        if (rule.priority == 3 && !allowedIps.includes(rule.condition.urlFilter)) {
+        if (rule.priority == 3) {
             allowedIps.push(rule.condition.urlFilter)
         } 
     })
