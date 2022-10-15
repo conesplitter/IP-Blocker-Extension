@@ -8,8 +8,7 @@
     },
     "permissions": [
       "declarativeNetRequest",
-      "declarativeNetRequestFeedback",
-      "storage"
+      "declarativeNetRequestFeedback"
     ],
     "action": {
       "default_title": "IP Blocker",
