@@ -85,8 +85,7 @@ newIpForm.addEventListener("submit",(e) => {
             
             newIpInput.value = "";
     
-            //saving the allowed Ips to local storage
-            saveAllowedIpsToLocalStorage(allowedIps);
+
           } 
           else {
     
@@ -149,10 +148,6 @@ function isIpValid(ip) {
 }
 
 
-function saveAllowedIpsToLocalStorage(allowedIpsArray) {
-    //Function to save the array of allowed IPs to the chrome local storage
-    chrome.storage.sync.set({"allowed_ips" : allowedIpsArray});
-}
 
 
 function addAllowedIP(ip, index) {
@@ -269,7 +264,6 @@ function deleteAllowedIp(index, li, ip){
     allowedIps.splice(index, 1); //delete it from the local allowed IP array
 
     li.remove();
-    saveAllowedIpsToLocalStorage(allowedIps); //save local allowed IP array to local storage
     getRules().then((rules) => {
         
         rules.forEach(rule => {
@@ -340,7 +334,6 @@ function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, i
                 allowedIps[index] = inputField.value; //saving the IP address to the local array of IPs
                 inputField.readOnly = true; //set it back so they can't edit i
                 saveIpBtn.remove()
-                saveAllowedIpsToLocalStorage(allowedIps); //save the allowed Ips array to local storage
         
                 editIpBtn.classList.remove("hidden");
     
