@@ -38,10 +38,9 @@ const errorMessages = [
 ]
 
 
-chrome.storage.sync.get(["private_ip"], ({private_ip }) => {
-    //Getting the state of the private IP toggle checkbox from the chrome local storage
-    privateIpCheckbox.checked = private_ip;
-})
+setPrivateIpCheckbox();
+
+
 
 getRules().then((rules) => {
     rules.forEach(rule => {
@@ -54,9 +53,29 @@ getRules().then((rules) => {
         //passing the IPs to the addAllowedIP function which will render them in the html
         addAllowedIP(ip, index)
     })
+
 })
 
 
+function setPrivateIpCheckbox() {
+    let possiblePrivateIPs = [];
+
+    getRules().then((rules) => {
+
+        rules.forEach(rule => {
+            if (rule.priority == 2) {
+                possiblePrivateIPs.push(rule.condition.urlFilter)
+            } 
+        })
+
+        if(privateIpsArray.every(elem => possiblePrivateIPs.includes(elem))) {
+            privateIpCheckbox.checked = true;
+        }
+        else {
+            privateIpCheckbox.checked = false;
+        }
+    })
+}
 
 newIpForm.addEventListener("submit",(e) => {
     //event listener for input field that add new ips

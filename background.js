@@ -2,7 +2,6 @@ let private_ip = false;
 
 
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.storage.sync.set({"private_ips" : private_ip});
 
     let idToDelete = [];
 
