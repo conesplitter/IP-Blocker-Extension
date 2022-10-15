@@ -50,8 +50,8 @@ getRules().then((rules) => {
     })
 
     allowedIps.forEach((ip, index) =>{
-        //passing the IPs to the addAllowedIP function which will render them in the html
-        addAllowedIP(ip, index)
+        //passing the IPs to the addAllowedIPsToHTML function which will render them in the html
+        addAllowedIPsToHTML(ip, index)
     })
 
 })
@@ -150,7 +150,7 @@ function isIpValid(ip) {
 
 
 
-function addAllowedIP(ip, index) {
+function addAllowedIPsToHTML(ip, index) {
     //Function to add the allowed IPs to the HTML
     let li = document.createElement("li");
 
@@ -192,8 +192,8 @@ function addAllowedIP(ip, index) {
 function addNewAllowedIp(ip) {
     //Function to add a new IP to the list, local storeage and create a rule for it
 
-    //first pass the IP to the addAllowedIP function to create the li for it and add it to the allowedIps array for local storage
-    addAllowedIP(ip);
+    //first pass the IP to the addAllowedIPsToHTML function to create the li for it and add it to the allowedIps array for local storage
+    addAllowedIPsToHTML(ip);
 
     
     getRules().then((rules) => {
@@ -208,7 +208,7 @@ function addNewAllowedIp(ip) {
             ruleIds.push(rule.id) //add the rule IDs to a new variable
         })
         
-        const gapsInRuleIDs = [];
+        let gapsInRuleIDs = [];
     
         for (let i in ruleIds) {
             //find gaps in the rules, as long as that ID number is greater than 28
