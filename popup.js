@@ -57,26 +57,6 @@ getRules().then((rules) => {
 })
 
 
-function setPrivateIpCheckbox() {
-    let possiblePrivateIPs = [];
-
-    getRules().then((rules) => {
-
-        rules.forEach(rule => {
-            if (rule.priority == 2) {
-                possiblePrivateIPs.push(rule.condition.urlFilter)
-            } 
-        })
-
-        if(privateIpsArray.every(elem => possiblePrivateIPs.includes(elem))) {
-            privateIpCheckbox.checked = true;
-        }
-        else {
-            privateIpCheckbox.checked = false;
-        }
-    })
-}
-
 newIpForm.addEventListener("submit",(e) => {
     //event listener for input field that add new ips
     e.preventDefault();
@@ -130,6 +110,28 @@ newIpForm.addEventListener("submit",(e) => {
 
     })
 })
+
+
+function setPrivateIpCheckbox() {
+    //function to see if there is already allow rules for the private IP ranges to then set the privateIpCheckbox.checked value
+    let possiblePrivateIPs = [];
+
+    getRules().then((rules) => {
+
+        rules.forEach(rule => {
+            if (rule.priority == 2) {
+                possiblePrivateIPs.push(rule.condition.urlFilter)
+            } 
+        })
+
+        if(privateIpsArray.every(ip => possiblePrivateIPs.includes(ip))) {
+            privateIpCheckbox.checked = true;
+        }
+        else {
+            privateIpCheckbox.checked = false;
+        }
+    })
+}
 
 async function getRules() {
     try {
