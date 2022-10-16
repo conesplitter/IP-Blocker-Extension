@@ -212,7 +212,7 @@ function addAllowedIPsToHTML(ip, index) {
 
 
     editIpBtn.addEventListener("click", () => {
-        editAllowedIp(index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, ip);
+        editAllowedIp(index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, inputField.value);
     })
 
     AllowedIPAndBtnsDiv.appendChild(inputField)    
@@ -312,7 +312,6 @@ async function deleteAllowedIp(index, li, ip){
 
 
 
-
 async function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIpBtn, ip) {
     //function that edits the allowed IP addresses
 
@@ -339,7 +338,6 @@ async function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIp
         rules.forEach(rule => {
             allIps.push(rule.condition.urlFilter); //push all of the IP addresses to a new variable
         })
-
 
         if (!allIps.includes(inputField.value) || inputField.value == ip){ 
             // If the new IP isn't already on the allowed or the IP address is the same as it already was
@@ -379,7 +377,7 @@ async function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIp
              )
         }
         else {
-            //error cehcking for editing the IP
+            //Error cehcking for editing the IP
 
             let editErrorMessage = document.createElement("p")
             
