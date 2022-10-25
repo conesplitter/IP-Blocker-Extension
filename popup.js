@@ -299,7 +299,6 @@ async function deleteAllowedIp(index, li, ip){
     rules.forEach(rule => {
         if (rule.condition.urlFilter == ip && rule.priority == 3) {
             //if the ID of the rule by the IP address and the prority
-            console.log(`${rule.id} has been deleted`);
             chrome.declarativeNetRequest.updateDynamicRules(
                 {
                     removeRuleIds: [rule.id]
