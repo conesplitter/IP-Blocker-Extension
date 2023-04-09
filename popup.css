@@ -72,27 +72,41 @@ p{
   border-radius: 0.25rem;
   padding: 0.3rem;
   color: white;
-  transition: transform 0.25s;
+  transition: all 0.25s;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
-.btn:hover {
+/* .btn:hover {
   -webkit-backface-visibility: hidden;
   transform: translateY(-0.05rem);
-}
+} */
 
 .deleteBtn {
   background-color: #ff8181;
+}
+.deleteBtn:hover {
+  background-color: #f73030;
 }
 
 .editBtn {
   background-color: #399ebf;
 }
+.editBtn:hover {
+  background-color: #3973bf;
+}
 
 .saveBtn {
   background-color: #81d381;
 }
+.saveBtn:hover {
+  background-color: #19b119;
+}
+
 .submitBtn {
-  background-color: #b3bbb3;
+  background-color: #1a48df;
+}
+.submitBtn:hover {
+  background-color: #3973bf;
 }
 
 .AllowedIPAndBtns {
