@@ -1,6 +1,3 @@
-let private_ip = false;
-
-
 chrome.runtime.onInstalled.addListener(() => {
 
     let idToDelete = [];
