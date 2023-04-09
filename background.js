@@ -66,6 +66,7 @@ const blockUrls = [
 
 blockUrls.forEach((domain, index) => {
     let id = index + 19;
+    //the 19 is for the Private IP addresses, 18 of them then + 1 as the index starts from 0
 
     chrome.declarativeNetRequest.updateDynamicRules(
        {addRules:[{

@@ -1,7 +1,5 @@
 let privateIpCheckbox = document.getElementById("privateIpCheckbox");
-
 let allowedIpList = document.getElementById("allowedIpList");
-
 let newIpForm = document.getElementById("newIpForm");
 let newIpInput = document.getElementById("newIpInput");
 let errorMessage = document.getElementById("errorMessage");
@@ -130,9 +128,11 @@ privateIpCheckbox.addEventListener('click', () => {
 
 
 async function intialGetRules(){
+    //Function to get the rules initially to then add to the HTML 
     const rules = await getRules();
     rules.forEach(rule => {
         if (rule.priority == 3) {
+            //allowed IPs that the user has added have a priority of 3
             allowedIps.push(rule.condition.urlFilter)
         } 
     })
@@ -167,6 +167,7 @@ async function setPrivateIpCheckbox() {
 
 
 async function getRules() {
+    //Funciton to get all of the rules
     try {
         return await chrome.declarativeNetRequest.getDynamicRules();
     } catch(error) {
@@ -177,6 +178,7 @@ async function getRules() {
 
 
 function isIpValid(ip) {
+    //Function to check if an IP address is vaild
    return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ip)
    //^^^^ Regex to check to see if the input is a valid ip address
 }
@@ -224,7 +226,7 @@ function addAllowedIPsToHTML(ip, index) {
 }
 
 async function addNewAllowedIp(ip) {
-    //Function to add a new IP to the list, local storeage and create a rule for it
+    //Function to add a new IP to the rule list
 
     //first pass the IP to the addAllowedIPsToHTML function to create the li for it and add it to the allowedIps array for local storage
     addAllowedIPsToHTML(ip);
@@ -298,7 +300,7 @@ async function deleteAllowedIp(index, li, ip){
 
     rules.forEach(rule => {
         if (rule.condition.urlFilter == ip && rule.priority == 3) {
-            //if the ID of the rule by the IP address and the prority
+            //if IP address of the rule and the one passed match and the prority is 3 then delete the rule
             chrome.declarativeNetRequest.updateDynamicRules(
                 {
                     removeRuleIds: [rule.id]
@@ -358,7 +360,7 @@ async function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIp
             
 
             allowedIps[index] = inputField.value; //saving the IP address to the local array of IPs
-            inputField.readOnly = true; //set it back so they can't edit i
+            inputField.readOnly = true; //set it back so they can't edit it
             saveIpBtn.remove()
     
             editIpBtn.classList.remove("hidden");
@@ -401,8 +403,3 @@ async function editAllowedIp (index, li, AllowedIPAndBtnsDiv, inputField, editIp
     })
     
 }
-
-
-
-
-
